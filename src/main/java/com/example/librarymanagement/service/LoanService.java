@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.librarymanagement.dto.LoanDTO;
 import com.example.librarymanagement.entity.Loan;
 import com.example.librarymanagement.entity.User;
 import com.example.librarymanagement.entity.LoanItem;
@@ -22,28 +23,25 @@ public class LoanService {
         this.userRepository = userRepository;
     }
     
-    public List<Loan> getAllLoans(){
-        return loanRepository.findAll();
+    public List<LoanDTO> getAllLoans(){
+        return loanRepository.findAll().stream()
+            .map(LoanDTO::new)
+            .toList();
     }
 
-    public Optional<Loan> getLoanById(Long id){
-        return loanRepository.findById(id);
+    public Optional<LoanDTO> getLoanById(Long id){
+        return loanRepository.findById(id).map(LoanDTO::new);
     }
 
-    public Loan addLoan(List<LoanItem> loanItems, Long userId) {
+    public LoanDTO addLoan(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new RuntimeException("User not found"));
 
     Loan loan = new Loan();
     loan.setStatus(false);
     loan.setUser(user);
-    loan.setLoanItems(loanItems);
 
-    for (LoanItem item : loanItems) {
-        item.setLoan(loan);
-    }
-
-    return loanRepository.save(loan);
+    return new LoanDTO(loanRepository.save(loan));
 }
 
     public void deleteLoan(Long id){

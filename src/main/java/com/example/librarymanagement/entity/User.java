@@ -1,6 +1,8 @@
 package com.example.librarymanagement.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 
 @Entity
@@ -10,11 +12,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @NotNull
     private String fullName;
 
+    @NotNull
     private String email;
 
     public User(){}
+
+    public User(String fullName, String email) {
+        this.fullName = fullName;
+        this.email = email;
+    }
 
     @OneToMany(mappedBy = "user")
     private List<Loan> loans;

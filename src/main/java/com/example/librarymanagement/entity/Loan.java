@@ -1,6 +1,8 @@
 package com.example.librarymanagement.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -11,7 +13,10 @@ public class Loan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long loanId;
 
+    @NotNull
     private LocalDate loanDate;
+
+    @NotNull
     private LocalDate dueDate;
     private Boolean status;
 
@@ -23,6 +28,9 @@ public class Loan {
     private List<LoanItem> loanItems;
 
     public Loan() {
+    }
+    public Loan(LocalDate loanDate) {
+        this.loanDate = loanDate;
     }
 
     public Long getLoanId() {
