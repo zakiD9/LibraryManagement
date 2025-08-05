@@ -31,6 +31,13 @@ public class LoanItemService {
             .orElseThrow(() -> new RuntimeException("Book not found"));
         Loan loan = loanRepository.findById(loanId)
             .orElseThrow(() -> new RuntimeException("Loan not found"));
+        if (book.getAvailableCopies() <= 0) {
+            throw new RuntimeException("No available copies for this book");
+        }
+        if (loan.getStatus()) {
+            throw new RuntimeException("Loan is already completed");
+        }
+        loanItem.setQuantity(loanItem.getQuantity() + 1);
         book.setAvailableCopies(book.getAvailableCopies() - 1);
         loanItem.setBook(book);
         loanItem.setLoan(loan);
@@ -41,12 +48,20 @@ public class LoanItemService {
     }
 
     public Optional<LoanItemDTO> getLoanItemById(Long id) {
-        return loanItemRepository.findById(id).map(LoanItemDTO::new);
+    if (!loanItemRepository.existsById(id)) {
+        throw new RuntimeException("LoanItem not found with id: " + id);
     }
+    return loanItemRepository.findById(id).map(LoanItemDTO::new);
+}
 
     public void returnLoanItem(Long loanItemId) {
     LoanItem loanItem = loanItemRepository.findById(loanItemId)
-        .orElseThrow(() -> new RuntimeException("LoanItem not found"));
+        .orElseThrow(() -> new RuntimeException("LoanItem not found with id: " + loanItemId));
+
+    if (Boolean.TRUE.equals(loanItem.getIsReturned())) {
+        throw new RuntimeException("LoanItem is already returned");
+    }
+
     loanItem.setIsReturned(true);
     loanItemRepository.save(loanItem);
 
@@ -61,6 +76,14 @@ public class LoanItemService {
 }
 
     public void deleteLoanItem(Long id) {
-        loanItemRepository.deleteById(id);
+    LoanItem loanItem = loanItemRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("LoanItem not found with id: " + id));
+
+    if (!Boolean.TRUE.equals(loanItem.getIsReturned())) {
+        throw new RuntimeException("Cannot delete LoanItem: it has not been returned yet.");
     }
+
+    loanItemRepository.deleteById(id);
+}
+
 }

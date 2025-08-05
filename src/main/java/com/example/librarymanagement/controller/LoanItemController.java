@@ -1,10 +1,8 @@
 package com.example.librarymanagement.controller;
 
 import com.example.librarymanagement.dto.LoanItemDTO;
-import com.example.librarymanagement.entity.LoanItem;
 import com.example.librarymanagement.service.LoanItemService;
 
-import java.lang.StackWalker.Option;
 import java.util.Optional;
 
 import org.springframework.web.bind.annotation.*;

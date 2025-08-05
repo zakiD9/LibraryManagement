@@ -1,13 +1,10 @@
 package com.example.librarymanagement.controller;
 
 import com.example.librarymanagement.dto.LoanDTO;
-import com.example.librarymanagement.entity.Loan;
-import com.example.librarymanagement.entity.LoanItem;
 import com.example.librarymanagement.service.LoanService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/loans")

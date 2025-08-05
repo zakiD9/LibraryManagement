@@ -3,6 +3,8 @@ package com.example.librarymanagement.service;
 import com.example.librarymanagement.Exceptions.ResourceNotFoundException;
 import com.example.librarymanagement.entity.Book;
 import com.example.librarymanagement.repository.BookRepository;
+import com.example.librarymanagement.repository.LoanItemRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +14,11 @@ import java.util.Optional;
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final LoanItemRepository loanItemRepository;
 
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository, LoanItemRepository loanItemRepository) {
         this.bookRepository = bookRepository;
+        this.loanItemRepository = loanItemRepository;
     }
 
     public List<Book> getAllBooks() {
@@ -46,9 +50,13 @@ public class BookService {
     }
 
     public void deleteBook(Long id) {
+        if (loanItemRepository.existsByBookBookIdAndLoanStatusFalse(id)) {
+        throw new IllegalArgumentException("Cannot delete book: it is associated with an active loan.");
+    }
     if (!bookRepository.existsById(id)) {
         throw new ResourceNotFoundException("Book not found with id: " + id);
     }
+
         bookRepository.deleteById(id);
     }
 }

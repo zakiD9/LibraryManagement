@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.example.librarymanagement.dto.LoanDTO;
 import com.example.librarymanagement.entity.Loan;
 import com.example.librarymanagement.entity.User;
-import com.example.librarymanagement.entity.LoanItem;
 import com.example.librarymanagement.repository.LoanRepository;
 import com.example.librarymanagement.repository.UserRepository;
 
@@ -30,13 +29,19 @@ public class LoanService {
     }
 
     public Optional<LoanDTO> getLoanById(Long id){
+        if (!loanRepository.existsById(id)) {
+            throw new RuntimeException("Loan not found with id: " + id);
+        }
         return loanRepository.findById(id).map(LoanDTO::new);
     }
 
     public LoanDTO addLoan(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new RuntimeException("User not found"));
-
+    
+        if (loanRepository.existsByUserUserIdAndStatusFalse(userId)) {
+            throw new RuntimeException("User already has an active loan");
+        }
     Loan loan = new Loan();
     loan.setStatus(false);
     loan.setUser(user);
@@ -45,6 +50,11 @@ public class LoanService {
 }
 
     public void deleteLoan(Long id){
+        Loan loan = loanRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Loan not found with id: " + id));
+            if(loan.getStatus()) {
+                throw new RuntimeException("Cannot delete Loan: it has already been completed.");
+            }
         loanRepository.deleteById(id);
     }
 }
