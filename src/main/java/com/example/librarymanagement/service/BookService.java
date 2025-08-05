@@ -1,6 +1,7 @@
 package com.example.librarymanagement.service;
 
 import com.example.librarymanagement.Exceptions.ResourceNotFoundException;
+import com.example.librarymanagement.dto.BookDTO;
 import com.example.librarymanagement.entity.Book;
 import com.example.librarymanagement.repository.BookRepository;
 import com.example.librarymanagement.repository.LoanItemRepository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -21,20 +23,23 @@ public class BookService {
         this.loanItemRepository = loanItemRepository;
     }
 
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public List<BookDTO> getAllBooks() {
+        return bookRepository.findAll().stream()
+                .map(book -> new BookDTO(book))
+                .collect(Collectors.toList());
     }
 
-    public Book getBookById(Long id) {
-    return bookRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
+    public BookDTO getBookById(Long id) {
+    Book book = bookRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
+    return new BookDTO(book);
 }
 
-    public Book addBook(Book book) {
+    public BookDTO addBook(Book book) {
         if(bookRepository.findByTitle(book.getTitle()).isPresent()) {
             throw new IllegalArgumentException("Book with title '" + book.getTitle() + "' already exists.");
         }
-        return bookRepository.save(book);
+        return new BookDTO(bookRepository.save(book));
     }
 
     public String updateBookQuantity(Long bookId, Integer newQuantity) {

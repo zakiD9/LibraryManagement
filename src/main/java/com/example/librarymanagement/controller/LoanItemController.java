@@ -5,6 +5,8 @@ import com.example.librarymanagement.service.LoanItemService;
 
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,23 +20,29 @@ public class LoanItemController {
     }
 
     @PostMapping
-    public LoanItemDTO addLoanItem(
+    public ResponseEntity<LoanItemDTO> addLoanItem(
                                 @RequestParam Long bookId,
                                 @RequestParam Long loanId) {
-        return loanItemService.addLoanItem(bookId, loanId);
+        LoanItemDTO loanItemDTO = loanItemService.addLoanItem(bookId, loanId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(loanItemDTO);
     }
 
     @GetMapping("/{id}")
-    public Optional<LoanItemDTO> getLoanItemById(@PathVariable Long id) {
-        return loanItemService.getLoanItemById(id); }
+    public ResponseEntity<LoanItemDTO> getLoanItemById(@PathVariable Long id) {
+        Optional<LoanItemDTO> loanItemDTO = loanItemService.getLoanItemById(id);
+        return loanItemDTO.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
     @PutMapping("/{loanItemId}/return")
-    public void returnLoanItem(@PathVariable Long loanItemId) {
+    public ResponseEntity<Void> returnLoanItem(@PathVariable Long loanItemId) {
         loanItemService.returnLoanItem(loanItemId);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLoanItem(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLoanItem(@PathVariable Long id) {
         loanItemService.deleteLoanItem(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -2,6 +2,8 @@ package com.example.librarymanagement.controller;
 
 import com.example.librarymanagement.dto.LoanDTO;
 import com.example.librarymanagement.service.LoanService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,17 +18,20 @@ public class LoanController {
         this.loanService = loanService;
     }
     @PostMapping
-    public LoanDTO addLoan(@RequestParam Long userId) {
-        return loanService.addLoan(userId);
+    public ResponseEntity<LoanDTO> addLoan(@RequestParam Long userId) {
+        LoanDTO loanDTO = loanService.addLoan(userId);
+        return ResponseEntity.status(201).body(loanDTO);
     }
 
     @GetMapping
-    public List<LoanDTO> getAllLoans() {
-        return loanService.getAllLoans();
+    public ResponseEntity<List<LoanDTO>> getAllLoans() {
+        List<LoanDTO> loans = loanService.getAllLoans();
+        return ResponseEntity.ok(loans);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLoan(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLoan(@PathVariable Long id) {
         loanService.deleteLoan(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.librarymanagement.service;
 
+import com.example.librarymanagement.dto.UserDTO;
 import com.example.librarymanagement.entity.User;
 import com.example.librarymanagement.repository.LoanRepository;
 import com.example.librarymanagement.repository.UserRepository;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -19,16 +21,19 @@ public class UserService {
         this.loanRepository = loanRepository;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> new UserDTO(user))
+                .collect(Collectors.toList());
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public Optional<UserDTO> getUserById(Long id) {
+        return userRepository.findById(id).map(user -> new UserDTO(user));
     }
 
-    public User addUser(User user) {
-        return userRepository.save(user);
+    public UserDTO addUser(User user) {
+        return new UserDTO(userRepository.save(user));
     }
 
     public void deleteUser(Long id) {
