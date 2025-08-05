@@ -1,5 +1,6 @@
 package com.example.librarymanagement.service;
 
+import com.example.librarymanagement.Exceptions.ResourceNotFoundException;
 import com.example.librarymanagement.entity.Book;
 import com.example.librarymanagement.repository.BookRepository;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,15 @@ public class BookService {
         return bookRepository.findAll();
     }
 
-    public Optional<Book> getBookById(Long id) {
-        return bookRepository.findById(id);
-    }
+    public Book getBookById(Long id) {
+    return bookRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
+}
 
     public Book addBook(Book book) {
+        if(bookRepository.findByTitle(book.getTitle()).isPresent()) {
+            throw new IllegalArgumentException("Book with title '" + book.getTitle() + "' already exists.");
+        }
         return bookRepository.save(book);
     }
 
@@ -41,6 +46,9 @@ public class BookService {
     }
 
     public void deleteBook(Long id) {
+    if (!bookRepository.existsById(id)) {
+        throw new ResourceNotFoundException("Book not found with id: " + id);
+    }
         bookRepository.deleteById(id);
     }
 }

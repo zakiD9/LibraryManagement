@@ -1,6 +1,7 @@
 package com.example.librarymanagement.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -17,6 +18,7 @@ public class Book {
     private String author;
 
     @NotNull
+    @Min(0)
     private Integer availableCopies;
 
     public Book() {
