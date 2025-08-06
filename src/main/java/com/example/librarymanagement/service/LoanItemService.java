@@ -2,6 +2,8 @@ package com.example.librarymanagement.service;
 
 import com.example.librarymanagement.entity.LoanItem;
 import com.example.librarymanagement.entity.Loan;
+import com.example.librarymanagement.Exceptions.BadRequestException;
+import com.example.librarymanagement.Exceptions.ResourceNotFoundException;
 import com.example.librarymanagement.dto.LoanItemDTO;
 import com.example.librarymanagement.entity.Book;
 import com.example.librarymanagement.repository.BookRepository;
@@ -28,14 +30,14 @@ public class LoanItemService {
     public LoanItemDTO addLoanItem( Long bookId, Long loanId) {
         LoanItem loanItem = new LoanItem();
          Book book = bookRepository.findById(bookId)
-            .orElseThrow(() -> new RuntimeException("Book not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         Loan loan = loanRepository.findById(loanId)
-            .orElseThrow(() -> new RuntimeException("Loan not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Loan not found"));
         if (book.getAvailableCopies() <= 0) {
-            throw new RuntimeException("No available copies for this book");
+            throw new BadRequestException("No available copies for this book");
         }
         if (loan.getStatus()) {
-            throw new RuntimeException("Loan is already completed");
+            throw new BadRequestException("Loan is already completed");
         }
         loanItem.setQuantity(loanItem.getQuantity() + 1);
         book.setAvailableCopies(book.getAvailableCopies() - 1);
@@ -49,17 +51,17 @@ public class LoanItemService {
 
     public Optional<LoanItemDTO> getLoanItemById(Long id) {
     if (!loanItemRepository.existsById(id)) {
-        throw new RuntimeException("LoanItem not found with id: " + id);
+        throw new ResourceNotFoundException("LoanItem not found with id: " + id);
     }
     return loanItemRepository.findById(id).map(LoanItemDTO::new);
 }
 
     public void returnLoanItem(Long loanItemId) {
     LoanItem loanItem = loanItemRepository.findById(loanItemId)
-        .orElseThrow(() -> new RuntimeException("LoanItem not found with id: " + loanItemId));
+        .orElseThrow(() -> new ResourceNotFoundException("LoanItem not found with id: " + loanItemId));
 
     if (Boolean.TRUE.equals(loanItem.getIsReturned())) {
-        throw new RuntimeException("LoanItem is already returned");
+        throw new BadRequestException("LoanItem is already returned");
     }
 
     loanItem.setIsReturned(true);
@@ -77,10 +79,10 @@ public class LoanItemService {
 
     public void deleteLoanItem(Long id) {
     LoanItem loanItem = loanItemRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("LoanItem not found with id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("LoanItem not found with id: " + id));
 
     if (!Boolean.TRUE.equals(loanItem.getIsReturned())) {
-        throw new RuntimeException("Cannot delete LoanItem: it has not been returned yet.");
+        throw new BadRequestException("Cannot delete LoanItem: it has not been returned yet.");
     }
 
     loanItemRepository.deleteById(id);

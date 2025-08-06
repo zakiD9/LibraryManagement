@@ -29,10 +29,10 @@ public class UserController {
 
     @GetMapping("/{id}")
 public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-    return userService.getUserById(id)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
-}
+        Optional<UserDTO> userDTO = userService.getUserById(id);
+        return userDTO.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
     @PostMapping
     public ResponseEntity<UserDTO> addUser(@RequestBody User user) {

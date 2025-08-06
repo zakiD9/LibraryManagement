@@ -1,5 +1,6 @@
 package com.example.librarymanagement.service;
 
+import com.example.librarymanagement.Exceptions.BadRequestException;
 import com.example.librarymanagement.Exceptions.ResourceNotFoundException;
 import com.example.librarymanagement.dto.BookDTO;
 import com.example.librarymanagement.entity.Book;
@@ -37,7 +38,7 @@ public class BookService {
 
     public BookDTO addBook(Book book) {
         if(bookRepository.findByTitle(book.getTitle()).isPresent()) {
-            throw new IllegalArgumentException("Book with title '" + book.getTitle() + "' already exists.");
+            throw new ResourceNotFoundException("Book with title '" + book.getTitle() + "' already exists.");
         }
         return new BookDTO(bookRepository.save(book));
     }
@@ -56,7 +57,7 @@ public class BookService {
 
     public void deleteBook(Long id) {
         if (loanItemRepository.existsByBookBookIdAndLoanStatusFalse(id)) {
-        throw new IllegalArgumentException("Cannot delete book: it is associated with an active loan.");
+        throw new BadRequestException("Cannot delete book: it is associated with an active loan.");
     }
     if (!bookRepository.existsById(id)) {
         throw new ResourceNotFoundException("Book not found with id: " + id);

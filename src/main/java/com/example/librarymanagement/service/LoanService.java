@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.librarymanagement.Exceptions.BadRequestException;
+import com.example.librarymanagement.Exceptions.ResourceNotFoundException;
 import com.example.librarymanagement.dto.LoanDTO;
 import com.example.librarymanagement.entity.Loan;
 import com.example.librarymanagement.entity.User;
@@ -30,17 +32,17 @@ public class LoanService {
 
     public Optional<LoanDTO> getLoanById(Long id){
         if (!loanRepository.existsById(id)) {
-            throw new RuntimeException("Loan not found with id: " + id);
+            throw new ResourceNotFoundException("Loan not found with id: " + id);
         }
         return loanRepository.findById(id).map(LoanDTO::new);
     }
 
     public LoanDTO addLoan(Long userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new RuntimeException("User not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     
         if (loanRepository.existsByUserUserIdAndStatusFalse(userId)) {
-            throw new RuntimeException("User already has an active loan");
+            throw new BadRequestException("User already has an active loan");
         }
     Loan loan = new Loan();
     loan.setStatus(false);

@@ -1,5 +1,7 @@
 package com.example.librarymanagement.service;
 
+import com.example.librarymanagement.Exceptions.BadRequestException;
+import com.example.librarymanagement.Exceptions.ResourceNotFoundException;
 import com.example.librarymanagement.dto.UserDTO;
 import com.example.librarymanagement.entity.User;
 import com.example.librarymanagement.repository.LoanRepository;
@@ -33,16 +35,19 @@ public class UserService {
     }
 
     public UserDTO addUser(User user) {
+        if (user.getEmail() == null || userRepository.existsByEmail(user.getEmail())) {
+            throw new BadRequestException("Email is required and must be unique.");
+        }
         return new UserDTO(userRepository.save(user));
     }
 
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("User not found with id: " + id);
+            throw new ResourceNotFoundException("User not found with id: " + id);
         }
         if (loanRepository.existsByUserUserIdAndStatusFalse(id)) {
-        throw new IllegalArgumentException("Cannot delete user: user has an active loan.");
-    }
+            throw new BadRequestException("Cannot delete user: user has an active loan.");
+        }
 
         userRepository.deleteById(id);
     }
