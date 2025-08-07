@@ -6,6 +6,8 @@ import com.example.librarymanagement.dto.UserDTO;
 import com.example.librarymanagement.entity.User;
 import com.example.librarymanagement.repository.LoanRepository;
 import com.example.librarymanagement.repository.UserRepository;
+
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +30,11 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(user -> new UserDTO(user))
                 .collect(Collectors.toList());
+    }
+
+    public Page<UserDTO> getAllUsersByPagination(org.springframework.data.domain.Pageable pageable) {
+        return userRepository.findAll(pageable)
+            .map(UserDTO::new);
     }
 
     public Optional<UserDTO> getUserById(Long id) {

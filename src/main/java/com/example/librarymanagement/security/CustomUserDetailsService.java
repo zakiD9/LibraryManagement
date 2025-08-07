@@ -35,7 +35,7 @@ public UserDetails loadUserByUsername(String username) throws ResourceNotFoundEx
     User user = userRepository.findByEmail(username)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + username));
 
-    String role = user.getRole().name().toUpperCase();
+    String role ="ROLE_" +  user.getRole().name().toUpperCase();
 
     return new org.springframework.security.core.userdetails.User(
         user.getEmail(),

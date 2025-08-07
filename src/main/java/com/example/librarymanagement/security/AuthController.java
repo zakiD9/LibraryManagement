@@ -58,8 +58,8 @@ public ResponseEntity<?> login(@RequestBody LoginRequest request) {
     }
 
     UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-    String jwt = jwtUtil.generateToken(userDetails, userDetails.getAuthorities().stream()
-            .findFirst().map(Object::toString).orElse("USER"));
+    String jwt = jwtUtil.generateToken(userDetails,userDetails.getAuthorities().stream().findFirst().map(Object::toString).orElse("ROLE_USER")
+);
 
     return ResponseEntity.ok(new AuthResponse(jwt));
 }

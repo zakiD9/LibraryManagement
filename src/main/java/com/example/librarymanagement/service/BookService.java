@@ -6,8 +6,9 @@ import com.example.librarymanagement.dto.BookDTO;
 import com.example.librarymanagement.entity.Book;
 import com.example.librarymanagement.repository.BookRepository;
 import com.example.librarymanagement.repository.LoanItemRepository;
-
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,11 +31,26 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
+    public Page<BookDTO> searchBookByTitle(String title,org.springframework.data.domain.Pageable pageable){
+        Page<Book> booksPage;
+        if (title != null && !title.isEmpty()) {
+        booksPage = bookRepository.findByTitleContainingIgnoreCase(title, pageable);
+    } else {
+        booksPage = bookRepository.findAll(pageable);
+    }
+        return booksPage.map(BookDTO::new);
+    }
+
     public BookDTO getBookById(Long id) {
     Book book = bookRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
     return new BookDTO(book);
 }
+
+    public Page<BookDTO> getAllBooksByPagination(org.springframework.data.domain.Pageable pageable) {
+        return bookRepository.findAll(pageable)
+            .map(BookDTO::new);
+    }
 
     public BookDTO addBook(Book book) {
         if(bookRepository.findByTitle(book.getTitle()).isPresent()) {

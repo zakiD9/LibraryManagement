@@ -4,6 +4,10 @@ import com.example.librarymanagement.dto.UserDTO;
 import com.example.librarymanagement.entity.User;
 import com.example.librarymanagement.service.UserService;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +30,15 @@ public class UserController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/paginated")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Page<UserDTO>> getAllUsersByPagination(@RequestParam(defaultValue = "1") int page,
+                                                                  @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<UserDTO> users = userService.getAllUsersByPagination(pageable);
         return ResponseEntity.ok(users);
     }
 

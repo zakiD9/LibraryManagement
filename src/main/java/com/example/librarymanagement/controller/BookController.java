@@ -4,6 +4,9 @@ import com.example.librarymanagement.dto.BookDTO;
 import com.example.librarymanagement.entity.Book;
 import com.example.librarymanagement.service.BookService;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +28,36 @@ public class BookController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<BookDTO>> getAllBooks() {
         List<BookDTO> books = bookService.getAllBooks();
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/paginated")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Page<BookDTO>> getAllBooksByPagination(@RequestParam(defaultValue = "1") int page,
+                                                                  @RequestParam(defaultValue = "10") int size) {
+        if(page < 1) {
+            page = 1;
+        }
+        if(size < 1) {
+            size = 10; 
+        }
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<BookDTO> books = bookService.getAllBooksByPagination(pageable);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Page<BookDTO>> searchBookByTitle(@RequestParam String title,@RequestParam(defaultValue = "1") int page,
+                                                          @RequestParam(defaultValue = "10") int size) {
+        if(page < 1) {
+            page = 1;
+        }
+        if(size < 1){
+            size = 10;
+        }
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<BookDTO> books = bookService.searchBookByTitle(title,pageable);
         return ResponseEntity.ok(books);
     }
 
