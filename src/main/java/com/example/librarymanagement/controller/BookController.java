@@ -6,6 +6,7 @@ import com.example.librarymanagement.service.BookService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,24 +22,28 @@ public class BookController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<BookDTO>> getAllBooks() {
         List<BookDTO> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
         BookDTO bookDTO = bookService.getBookById(id);
         return bookDTO != null ? ResponseEntity.ok(bookDTO) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<BookDTO> addBook(@RequestBody Book book) {
         BookDTO createdBook = bookService.addBook(book);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
