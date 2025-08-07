@@ -21,7 +21,7 @@ public class LoanItemController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<LoanItemDTO> addLoanItem(
                                 @RequestParam Long bookId,
                                 @RequestParam Long loanId) {
@@ -30,7 +30,7 @@ public class LoanItemController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<LoanItemDTO> getLoanItemById(@PathVariable Long id) {
         Optional<LoanItemDTO> loanItemDTO = loanItemService.getLoanItemById(id);
         return loanItemDTO.map(ResponseEntity::ok)
@@ -38,14 +38,14 @@ public class LoanItemController {
     }
 
     @PutMapping("/{loanItemId}/return")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> returnLoanItem(@PathVariable Long loanItemId) {
         loanItemService.returnLoanItem(loanItemId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteLoanItem(@PathVariable Long id) {
         loanItemService.deleteLoanItem(id);
         return ResponseEntity.noContent().build();

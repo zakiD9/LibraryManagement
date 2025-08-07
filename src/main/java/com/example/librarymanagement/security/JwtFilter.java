@@ -43,8 +43,8 @@ public class JwtFilter extends OncePerRequestFilter {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
-                String role = jwtUtil.extractRole(jwt); // استخرج الدور من التوكن
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
+                String role = jwtUtil.extractRole(jwt);
+                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, List.of(authority));
 
