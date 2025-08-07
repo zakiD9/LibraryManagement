@@ -24,28 +24,6 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<BookDTO>> getAllBooks() {
-        List<BookDTO> books = bookService.getAllBooks();
-        return ResponseEntity.ok(books);
-    }
-
-    @GetMapping("/paginated")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<BookDTO>> getAllBooksByPagination(@RequestParam(defaultValue = "1") int page,
-                                                                  @RequestParam(defaultValue = "10") int size) {
-        if(page < 1) {
-            page = 1;
-        }
-        if(size < 1) {
-            size = 10; 
-        }
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<BookDTO> books = bookService.getAllBooksByPagination(pageable);
-        return ResponseEntity.ok(books);
-    }
-
     @GetMapping("/search")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<BookDTO>> searchBookByTitle(@RequestParam String title,@RequestParam(defaultValue = "1") int page,

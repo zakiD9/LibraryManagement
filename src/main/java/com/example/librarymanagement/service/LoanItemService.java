@@ -10,9 +10,14 @@ import com.example.librarymanagement.repository.BookRepository;
 import com.example.librarymanagement.repository.LoanItemRepository;
 import com.example.librarymanagement.repository.LoanRepository;
 
+import jakarta.transaction.Transactional;
+
 import java.time.LocalDate;
 import java.util.Optional;
 
+import org.hibernate.annotations.Cache;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,6 +32,8 @@ public class LoanItemService {
         this.bookRepository = bookRepository;
         this.loanRepository = loanRepository;
     }
+
+    @Transactional
     public LoanItemDTO addLoanItem( Long bookId, Long loanId) {
         LoanItem loanItem = new LoanItem();
          Book book = bookRepository.findById(bookId)
@@ -49,6 +56,7 @@ public class LoanItemService {
         return new LoanItemDTO(loanItemRepository.save(loanItem));
     }
 
+    @Cacheable(value = "loanItem", key = "#id")
     public Optional<LoanItemDTO> getLoanItemById(Long id) {
     if (!loanItemRepository.existsById(id)) {
         throw new ResourceNotFoundException("LoanItem not found with id: " + id);
@@ -56,6 +64,7 @@ public class LoanItemService {
     return loanItemRepository.findById(id).map(LoanItemDTO::new);
 }
 
+    @CachePut(value = "loanItem", key = "#loanItemId")
     public void returnLoanItem(Long loanItemId) {
     LoanItem loanItem = loanItemRepository.findById(loanItemId)
         .orElseThrow(() -> new ResourceNotFoundException("LoanItem not found with id: " + loanItemId));
@@ -77,6 +86,8 @@ public class LoanItemService {
     }
 }
 
+
+    @Transactional
     public void deleteLoanItem(Long id) {
     LoanItem loanItem = loanItemRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("LoanItem not found with id: " + id));

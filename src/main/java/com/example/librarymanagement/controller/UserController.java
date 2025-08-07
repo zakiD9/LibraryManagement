@@ -27,12 +27,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('USER')")

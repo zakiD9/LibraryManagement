@@ -3,6 +3,8 @@ package com.example.librarymanagement.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.annotations.Cache;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.example.librarymanagement.Exceptions.BadRequestException;
@@ -12,6 +14,8 @@ import com.example.librarymanagement.entity.Loan;
 import com.example.librarymanagement.entity.User;
 import com.example.librarymanagement.repository.LoanRepository;
 import com.example.librarymanagement.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class LoanService {
@@ -24,12 +28,14 @@ public class LoanService {
         this.userRepository = userRepository;
     }
     
+    @Cacheable(value = "loans", key = "#userId")
     public List<LoanDTO> getAllLoans(){
         return loanRepository.findAll().stream()
             .map(LoanDTO::new)
             .toList();
     }
 
+    @Cacheable(value = "loans", key = "#userId")
     public Optional<LoanDTO> getLoanById(Long id){
         if (!loanRepository.existsById(id)) {
             throw new ResourceNotFoundException("Loan not found with id: " + id);
@@ -37,6 +43,7 @@ public class LoanService {
         return loanRepository.findById(id).map(LoanDTO::new);
     }
 
+    @Transactional
     public LoanDTO addLoan(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -51,6 +58,7 @@ public class LoanService {
     return new LoanDTO(loanRepository.save(loan));
 }
 
+    @Transactional
     public void deleteLoan(Long id){
         Loan loan = loanRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Loan not found with id: " + id));
