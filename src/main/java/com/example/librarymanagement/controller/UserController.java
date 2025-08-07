@@ -1,5 +1,6 @@
 package com.example.librarymanagement.controller;
 
+import com.example.librarymanagement.dto.BookDTO;
 import com.example.librarymanagement.dto.UserDTO;
 import com.example.librarymanagement.entity.User;
 import com.example.librarymanagement.service.UserService;
@@ -33,12 +34,18 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/paginated")
+    @GetMapping("/search")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<UserDTO>> getAllUsersByPagination(@RequestParam(defaultValue = "1") int page,
-                                                                  @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<UserDTO>> searchUserByName(@RequestParam String name,@RequestParam(defaultValue = "1") int page,
+                                                          @RequestParam(defaultValue = "10") int size) {
+        if(page < 1) {
+            page = 1;
+        }
+        if(size < 1){
+            size = 10;
+        }
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<UserDTO> users = userService.getAllUsersByPagination(pageable);
+        Page<UserDTO> users = userService.searchUserByName(name, pageable);
         return ResponseEntity.ok(users);
     }
 

@@ -2,7 +2,9 @@ package com.example.librarymanagement.service;
 
 import com.example.librarymanagement.Exceptions.BadRequestException;
 import com.example.librarymanagement.Exceptions.ResourceNotFoundException;
+import com.example.librarymanagement.dto.BookDTO;
 import com.example.librarymanagement.dto.UserDTO;
+import com.example.librarymanagement.entity.Book;
 import com.example.librarymanagement.entity.User;
 import com.example.librarymanagement.repository.LoanRepository;
 import com.example.librarymanagement.repository.UserRepository;
@@ -32,9 +34,14 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Page<UserDTO> getAllUsersByPagination(org.springframework.data.domain.Pageable pageable) {
-        return userRepository.findAll(pageable)
-            .map(UserDTO::new);
+    public Page<UserDTO> searchUserByName(String name, org.springframework.data.domain.Pageable pageable) {
+        Page<User> usersPage;
+        if (name != null && !name.isEmpty()) {
+            usersPage = userRepository.findByNameContainingIgnoreCase(name, pageable);
+        } else {
+            usersPage = userRepository.findAll(pageable);
+        }
+        return usersPage.map(UserDTO::new);
     }
 
     public Optional<UserDTO> getUserById(Long id) {
